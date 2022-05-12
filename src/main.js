@@ -8,6 +8,7 @@ const layersDir = `${basePath}/layers`;
 const {
   format,
   baseUri,
+  animationUri,
   description,
   background,
   uniqueDnaTorrance,
@@ -35,7 +36,7 @@ let hashlipsGiffer = null;
 
 const buildSetup = () => {
   if (fs.existsSync(buildDir)) {
-    fs.rmdirSync(buildDir, { recursive: true });
+    fs.rmdirSync(buildDir, { recursive: false });
   }
   fs.mkdirSync(buildDir);
   fs.mkdirSync(`${buildDir}/json`);
@@ -68,28 +69,41 @@ const cleanName = (_str) => {
   return nameWithoutWeight;
 };
 
-const getElements = (path) => {
-  return fs
+const getElements = (path, pick) => {
+  let pickArr = [];
+  let pickFiles = fs
     .readdirSync(path)
     .filter((item) => !/(^|\/)\.[^\/\.]/g.test(item))
-    .map((i, index) => {
-      if (i.includes("-")) {
-        throw new Error(`layer name can not contain dashes, please fix: ${i}`);
-      }
-      return {
-        id: index,
-        name: cleanName(i),
-        filename: i,
-        path: `${path}${i}`,
-        weight: getRarityWeight(i),
-      };
-    });
+
+  pickFiles.map((i, index) => {
+    if (Array.isArray(pick)) {
+      pick.forEach(p => {
+        if (p === index) pickArr.push(i);
+      })
+    } else {
+      pickArr.push(i);
+    }
+    return pickArr
+  })
+
+  return pickArr.map((i, index) => {
+    if (i.includes("-")) {
+      throw new Error(`layer name can not contain dashes, please fix: ${i}`);
+    }
+    return {
+      id: index,
+      name: cleanName(i),
+      filename: i,
+      path: `${path}${i}`,
+      weight: getRarityWeight(i),
+    };
+  });
 };
 
 const layersSetup = (layersOrder) => {
   const layers = layersOrder.map((layerObj, index) => ({
     id: index,
-    elements: getElements(`${layersDir}/${layerObj.name}/`),
+    elements: getElements(`${layersDir}/${layerObj.name}/`, layerObj.pick),
     name:
       layerObj.options?.["displayName"] != undefined
         ? layerObj.options?.["displayName"]
@@ -134,12 +148,11 @@ const addMetadata = (_dna, _edition) => {
     name: `${namePrefix} #${_edition}`,
     description: description,
     image: `${baseUri}/${_edition}.png`,
-    dna: sha1(_dna),
+    animation_url: `${animationUri}/${_edition}.mp4`,
+    // dna: sha1(_dna),
     edition: _edition,
-    date: dateTime,
     ...extraMetadata,
     attributes: attributesList,
-    compiler: "HashLips Art Engine",
   };
   if (network == NETWORK.sol) {
     tempMetadata = {

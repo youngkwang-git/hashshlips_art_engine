@@ -7,7 +7,8 @@ const network = NETWORK.eth;
 // General metadata for Ethereum
 const namePrefix = "Your Collection";
 const description = "Remember to replace this description";
-const baseUri = "ipfs://NewUriToReplace";
+const baseUri = "ipfs://image";
+const animationUri = "";
 
 const solanaMetadata = {
   symbol: "YC",
@@ -22,17 +23,15 @@ const solanaMetadata = {
 };
 
 // If you have selected Solana then the collection starts from 0 automatically
+
 const layerConfigurations = [
   {
-    growEditionSizeTo: 5,
+    // 생성 개수
+    growEditionSizeTo: 2,
+    // 레이어 순서
     layersOrder: [
-      { name: "Background" },
-      { name: "Eyeball" },
-      { name: "Eye color" },
-      { name: "Iris" },
-      { name: "Shine" },
-      { name: "Bottom lid" },
-      { name: "Top lid" },
+      { name: "Goo"},
+      { name: "Bottom lid", pick:[0,1] },
     ],
   },
 ];
@@ -42,8 +41,8 @@ const shuffleLayerConfigurations = false;
 const debugLogs = false;
 
 const format = {
-  width: 512,
-  height: 512,
+  width: 500,
+  height: 500,
   smoothing: false,
 };
 
@@ -103,6 +102,7 @@ const preview_gif = {
 module.exports = {
   format,
   baseUri,
+  animationUri,
   description,
   background,
   uniqueDnaTorrance,

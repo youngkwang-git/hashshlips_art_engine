@@ -4,6 +4,7 @@ const fs = require("fs");
 
 const {
   baseUri,
+  animationUri,
   description,
   namePrefix,
   network,
@@ -18,11 +19,12 @@ data.forEach((item) => {
   if (network == NETWORK.sol) {
     item.name = `${namePrefix} #${item.edition}`;
     item.description = description;
-    item.creators = solanaMetadata.creators;
+    // item.creators = solanaMetadata.creators;
   } else {
     item.name = `${namePrefix} #${item.edition}`;
     item.description = description;
     item.image = `${baseUri}/${item.edition}.png`;
+    animationUri !== '' ? item.animation_url = `${animationUri}/${item.edition}.mp4` : delete item.animation_url;
   }
   fs.writeFileSync(
     `${basePath}/build/json/${item.edition}.json`,
